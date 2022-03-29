@@ -1,9 +1,6 @@
-import 'dart:convert' as convert;
-
 import 'package:clima/services/location.dart';
+import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -11,10 +8,14 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  GeolocatorPlatform geolocator = GeolocatorPlatform.instance;
+  final String apiKey = '9f5d4477a90bf530e3933badbdb338ef';
+
+  double latitude;
+  double longitude;
+
   @override
   void initState() {
-    getLocation();
+    getLocationData();
   }
 
   @override
@@ -22,29 +23,24 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return Scaffold();
   }
 
-  void getLocation() async {
+  void getLocationData() async {
     Location location = Location();
+
     await location.getCurrentLocation();
-    // print('latitude: ${location.latitude}');
-    // print('longitude: ${location.longitude}');
-    getData(location.latitude, location.longitude);
-  }
 
-  Future<void> getData(lat, lon) async {
-    print('getting weather data...');
-    String apiKey = 'e1c3d91cf2f873de37430cb956c8a7aa';
-    Uri url = Uri.parse('https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey');
-    http.Response response = await http.get(url);
+    latitude = location.latitude;
+    longitude = location.longitude;
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> responseData = convert.jsonDecode(response.body) as Map<String, dynamic>;
-      double temp = responseData['main']['temp'];
-      int condition = responseData['weather'][0]['id'];
-      String city = responseData['name'];
+    NetworkHelper networkHelper = NetworkHelper('https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey');
 
-      print('temp: $temp');
-      print('condition: $condition');
-      print('city: $city');
-    }
+    Map<String, dynamic> weatherData = await networkHelper.getData();
+
+    double temp = weatherData['main']['temp'];
+    int condition = weatherData['weather'][0]['id'];
+    String city = weatherData['name'];
+
+    print('temp: $temp');
+    print('condition: $condition');
+    print('city: $city');
   }
 }
