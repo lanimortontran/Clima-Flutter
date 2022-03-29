@@ -34,7 +34,7 @@ class Location {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low,
       );
-      print('position: $position');
+      // print('position: $position');
       latitude = position.latitude;
       longitude = position.longitude;
     } catch (e) {
