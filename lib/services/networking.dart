@@ -8,7 +8,7 @@ class NetworkHelper {
   NetworkHelper(this.url);
 
   Future<Map<String, dynamic>> getData() async {
-    print('getting weather data...');
+    print('getting data...');
     Uri uri = Uri.parse(url);
     http.Response response = await http.get(uri);
 
